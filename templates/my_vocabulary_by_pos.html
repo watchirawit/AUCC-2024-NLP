@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="/static/xx1.css">
+    <title>My Vocabulary - {{ pos_type }}</title>
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=dsgqVll3"></script>
+
+
+</head>
+<body>
+    <div class="header">
+        <a href="#default" class="logo">My Vocabulary - {{ pos_type }}</a>
+        <div class="header-right">
+          <a class="active" href="{{ url_for('my_vocabulary') }}">Part of Speech Type</a>
+      
+        </div>
+    </div>
+    <div class="legend-spacer"></div>
+    <table>
+        <tr>
+          <th>Thai Word</th>
+          <th>English Translation</th>
+          <th>Pronunciation</th>
+        </tr>
+        {% for word_thai,word_eng in words.items() %}
+        <tr>
+        
+          <td>{{ word_thai }}</td>
+          <td>{{ word_eng }}</td>
+          <td><button class="speak-button" onclick="speakThai('{{ word_thai }}')">Speak</button></td>
+        
+        </tr>
+        {% endfor %}
+      </table>
+
+    <!-- <ul>
+        <li>
+            <span>Thai Word</span>
+            <span>English Translation</span>
+            <span>Pronunciation</span>
+        </li>
+
+        {% for word in saved_words %}
+            <li>
+                <span>{{ word.thai_word }}</span> 
+                <span>{{ word.english_translation }}</span> 
+                <button class="speak-button" onclick="speakThai('{{ word.thai_word }}')">Speak</button>
+            </li>
+        {% endfor %}
+    </ul> -->
+    
+    
+    <script>
+function speakThai(text) {
+    responsiveVoice.speak(text, 'Thai Female', { rate: 0.8 });
+}
+</script>
+<footer>
+    <p>&copy; 2023 Thai POS Tagger</p>
+</footer>
+</body>
+</html>

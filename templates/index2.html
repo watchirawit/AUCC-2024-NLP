@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thai POS Tagger</title>
+    <link rel="stylesheet" href="/static/dsd.css">
+</head>
+<body>
+    <header>
+        <div class="header">
+            <a href="#default" class="logo">Thai POS Tagger</a>
+            <div class="header-right">
+                <a class="active" href="{{ url_for('my_vocabulary') }}">My Vocabulary</a>
+                <a class="active" href="{{ url_for('login') }}">Logout</a>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <section class="tagger-section">
+            <h1>Text Box</h1>
+            <div class="form-container">
+                <form method="POST">
+                    <div class="input-container">
+                        <textarea name="input_text" rows="4" cols="50" placeholder="Enter Thai text here"></textarea>
+                    </div>
+                    <div class="clear"></div> <!-- Clear the float -->
+                    <div class="checkboxes-container">
+                        <label><input type="checkbox" name="pos_tags" value="NOUN"> NOUN</label>
+                        <label><input type="checkbox" name="pos_tags" value="VERB"> VERB</label>
+                        <label><input type="checkbox" name="pos_tags" value="ADJ"> ADJ</label>
+                        <label><input type="checkbox" name="pos_tags" value="ADP"> ADP</label>
+                        <label><input type="checkbox" name="pos_tags" value="PROPN"> PROPN</label>
+                        <label><input type="checkbox" name="pos_tags" value="SCONJ"> SCONJ</label>
+                        <label><input type="checkbox" name="pos_tags" value="PRON"> PRON</label>
+                        <label><input type="checkbox" name="pos_tags" value="PART"> PART</label>
+                        <label><input type="checkbox" name="pos_tags" value="ADV"> ADV</label>
+                        <label><input type="checkbox" name="pos_tags" value="AUX"> AUX</label>
+                        <label><input type="checkbox" name="pos_tags" value="DET"> DET</label>
+                        <label><input type="checkbox" name="pos_tags" value="CCONJ"> CCONJ</label>
+                        <!-- Add more checkboxes here -->
+                    </div>
+                    <input type="submit" value="Tag Text">
+                </form>
+                <div class="selected-tags-container">
+                    <h2>Selected POS Tags:</h2>
+                    <p>
+                        {% for selected_tag in filtered_tags %}
+                            {{ selected_tag }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="result-section">
+            <div class="tagged-text">
+                <h2>Tagged Text:</h2>
+                <p id="tagged-text" data-translations='{"word1": "translation1", "word2": "translation2"}'>
+                    {{ tagged_text | safe }}
+                </p>
+            </div>
+        </section>
+        
+        <section class="legend-section">
+            <div class="legend">
+                <h2>POS Tag Legend:</h2>
+                <ul>
+                    <li><span class="NOUN">NOUN</span>: Noun</li>
+                    <li><span class="VERB">VERB</span>: Verb</li>
+                    <li><span class="ADJ">ADJ</span>: Adjective</li>
+                    <li><span class="ADP">ADP</span>: Adposition</li>
+                    <li><span class="PROPN">PROPN</span>: Proper noun</li>
+                    <li><span class="SCONJ">SCONJ</span>: Subordinating conjunction</li>
+                    <li><span class="PRON">PRON</span>: Pronoun</li>
+                    <li><span class="PART">PART</span>: Particle</li>
+                    <li><span class="ADV">ADV</span>: Adverb</li>
+                    <li><span class="AUX">AUX</span>: Auxiliary</li>
+                    <li><span class="DET">DET</span>: Determiner</li>
+                    <li><span class="CCONJ">CCONJ</span>: Coordinating conjunction</li>
+                    <!-- Add more legend items here -->
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Thai POS Tagger</p>
+    </footer>
+
+    <script>
+                document.addEventListener("DOMContentLoaded", function() {
+            const taggedText = document.getElementById("tagged-text");
+            const translations = JSON.parse(taggedText.getAttribute("data-translations"));
+            
+            taggedText.addEventListener("mouseover", function(event) {
+                if (event.target.tagName === "SPAN") {
+                    const thaiWord = event.target.textContent;
+                    const translation = translations[thaiWord];
+                    if (translation) {
+                        const popUp = document.createElement("div");
+                        popUp.classList.add("translation-popup");
+                        popUp.textContent = translation;
+                        event.target.appendChild(popUp);
+                    }
+                }
+            });
+            
+            taggedText.addEventListener("mouseout", function(event) {
+                if (event.target.tagName === "SPAN") {
+                    const popUp = event.target.querySelector(".translation-popup");
+                    if (popUp) {
+                        popUp.remove();
+                    }
+                }
+            });
+        });
+        function saveWord(button) {
+    const thaiWord = button.getAttribute('data-thai-word');
+    const englishTranslation = button.getAttribute('data-english-translation');
+    const pos = button.getAttribute('data-pos');
+
+    // Send an AJAX request to save the word data
+    fetch('/save_word', {
+        method: 'POST',
+        body: JSON.stringify({
+            thai_word: thaiWord,
+            english_translation: englishTranslation,
+            pos: pos
+        }),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Word saved: ' + thaiWord);
+        } else {
+            alert('Failed to save word.');
+        }
+    })
+    .catch(error => {
+        alert('Error saving word: ' + error);
+    });
+}
+        // Your JavaScript code here
+    </script>
+</body>
+</html>
